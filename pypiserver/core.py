@@ -94,6 +94,15 @@ def find_packages(pkgs, prefix=""):
             continue
         yield x
 
+def find_packages_verion(pkgs, prefix="", version=""):
+    prefix = normalize_pkgname(prefix)
+    version = normalize_pkgname(version)
+    for x in pkgs:
+        if prefix and normalize_pkgname(x.pkgname) != prefix:
+            continue
+        if version and normalize_pkgname(x.version) != version:
+            continue
+        yield x
 
 def store(root, filename, data):
     assert "/" not in filename

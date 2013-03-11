@@ -12,7 +12,7 @@ else:
 
 from bottle import static_file, redirect, request, HTTPError, Bottle
 from pypiserver import __version__
-from pypiserver.core import listdir, find_packages, store
+from pypiserver.core import listdir, find_packages, store, find_packages_verion
 
 packages = None
 
@@ -181,6 +181,27 @@ def simpleindex():
     res.append("</body></html>")
     return "".join(res)
 
+
+@app.route("/simple/:prefix/:version")
+@app.route("/simple/:prefix/:version/")
+def simple_package(prefix="", version=""):
+
+    fp = request.fullpath
+    if not fp.endswith("/"):
+        fp += "/"
+
+    files = [x.relfn for x in sorted(find_packages_verion(packages(), prefix=prefix, version=version), key=lambda x: x.parsed_version)]
+
+    res = ["<html><head><title>Links for %s</title></head><body>\n" % prefix]
+    res.append("<h1>Links for %s</h1>\n" % prefix)
+    for x in files:
+        abspath = urljoin(fp, "/packages/%s" % x.replace("\\", "/"))
+
+        res.append('<a href="%s">%s</a><br>\n' % (abspath, os.path.basename(x)))
+
+    res.append("</body></html>\n")
+ 
+    return "".join(res)
 
 @app.route("/simple/:prefix")
 @app.route("/simple/:prefix/")
